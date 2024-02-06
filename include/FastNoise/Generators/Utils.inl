@@ -5,12 +5,12 @@ namespace FastNoise
 {    
     namespace Primes
     {
-        static constexpr int X = 501125321;
-        static constexpr int Y = 1136930381;
-        static constexpr int Z = 1720413743;
-        static constexpr int W = 1066037191;
+        static constexpr uint32_t X = 501125321;
+        static constexpr uint32_t Y = 1136930381;
+        static constexpr uint32_t Z = 1720413743;
+        static constexpr uint32_t W = 1066037191;
 
-        static constexpr int Lookup[] = { X,Y,Z,W };
+        static constexpr uint32_t Lookup[] = { X, Y, Z, W };
     }
 
     static constexpr float ROOT2 = 1.4142135623730950488f;

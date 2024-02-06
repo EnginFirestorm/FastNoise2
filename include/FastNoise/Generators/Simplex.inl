@@ -373,6 +373,235 @@ class FastSIMD::DispatchClass<FastNoise::OpenSimplex2, SIMD> final : public virt
 
         return float32v( 32.69428253173828125f ) * val;
     }
+
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y, float32v z, float32v w ) const
+    {
+        this->ScalePositions( x, y, z, w );
+
+        float32v f = float32v( -0.138196601125011f ) * ( x + y + z + w );
+        float32v xs = x + f;
+        float32v ys = y + f;
+        float32v zs = z + f;
+        float32v ws = w + f;
+
+        float32v xsi = FS::Floor( xs );
+        float32v ysi = FS::Floor( ys );
+        float32v zsi = FS::Floor( zs );
+        float32v wsi = FS::Floor( ws );
+        int32v xsb = FS::Convert<int>( xsi ) * int32v( Primes::X );
+        int32v ysb = FS::Convert<int>( ysi ) * int32v( Primes::Y );
+        int32v zsb = FS::Convert<int>( zsi ) * int32v( Primes::Z );
+        int32v wsb = FS::Convert<int>( wsi ) * int32v( Primes::W );
+        xsi = xs - xsi;
+        ysi = ys - ysi;
+        zsi = zs - zsi;
+        wsi = ws - wsi;
+
+        float32v sumsi = xsi + ysi + zsi + wsi;
+        
+        float32v firstLattice = FS::Floor( sumsi * float32v( 1.25f ) );
+
+        sumsi -= firstLattice * float32v( 0.8f );
+
+        float32v firstLattice02 = firstLattice * float32v( 0.2f );
+        xsi -= firstLattice02;
+        ysi -= firstLattice02;
+        zsi -= firstLattice02;
+        wsi -= firstLattice02;
+
+        int32v firstLatticeI = FS::Convert<int>( firstLattice );
+        int32v firstLattice128 = firstLatticeI << 7;
+        xsb -= firstLattice128;                
+        ysb -= firstLattice128;            
+        zsb -= firstLattice128;        
+        wsb -= firstLattice128;
+
+        int32v xLatticeCoordOffset = FS::MaskedSub( firstLatticeI == int32v( 0 ), int32v( 128 * Primes::X ), int32v( 641 * Primes::X ) );
+        int32v yLatticeCoordOffset = FS::MaskedSub( firstLatticeI == int32v( 1 ), int32v( 128 * Primes::Y ), int32v( 641 * Primes::Y ) );
+        int32v zLatticeCoordOffset = FS::MaskedSub( firstLatticeI == int32v( 2 ), int32v( 128 * Primes::Z ), int32v( 641 * Primes::Z ) );
+        int32v wLatticeCoordOffset = FS::MaskedSub( firstLatticeI == int32v( 3 ), int32v( 128 * Primes::W ), int32v( 641 * Primes::W ) );
+
+        // 0
+        mask32v v0x = xsi >= FS::Max( FS::Max( ysi, zsi ), FS::Max( wsi, float32v( 1 ) - sumsi ) );
+        mask32v v0y = ysi >= FS::Max( FS::Max( zsi, wsi ), FS::Max( xsi, float32v( 1 ) - sumsi ) );
+        mask32v v0z = zsi >= FS::Max( FS::Max( wsi, xsi ), FS::Max( ysi, float32v( 1 ) - sumsi ) );
+        mask32v v0w = wsi >= FS::Max( FS::Max( xsi, ysi ), FS::Max( zsi, float32v( 1 ) - sumsi ) );
+
+        int32v vh0x = FS::MaskedAdd( v0x, xsb, int32v( Primes::X ) );
+        int32v vh0y = FS::MaskedAdd( v0y, ysb, int32v( Primes::Y ) );
+        int32v vh0z = FS::MaskedAdd( v0z, zsb, int32v( Primes::Z ) );
+        int32v vh0w = FS::MaskedAdd( v0w, wsb, int32v( Primes::W ) ); 
+
+        xsb = vh0x + xLatticeCoordOffset;
+        ysb = vh0y + xLatticeCoordOffset;
+        zsb = vh0z + xLatticeCoordOffset;
+        wsb = vh0w + xLatticeCoordOffset;
+        xsi = FS::MaskedDecrement( v0x, xsi );
+        ysi = FS::MaskedDecrement( v0y, ysi );
+        zsi = FS::MaskedDecrement( v0z, zsi );
+        wsi = FS::MaskedDecrement( v0w, wsi );
+        sumsi = xsi + ysi + zsi + wsi;
+
+        float32v d0x = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), xsi );
+        float32v d0y = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), ysi );
+        float32v d0z = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), zsi );
+        float32v d0w = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), wsi );
+
+        xsi += float32v( 0.2f );
+        ysi += float32v( 0.2f );
+        zsi += float32v( 0.2f );
+        wsi += float32v( 0.2f );
+        sumsi += float32v( 0.8f );
+
+        // 1
+        mask32v v1x = xsi >= FS::Max( FS::Max( ysi, zsi ), FS::Max( wsi, float32v( 1 ) - sumsi ) );
+        mask32v v1y = ysi >= FS::Max( FS::Max( zsi, wsi ), FS::Max( xsi, float32v( 1 ) - sumsi ) );
+        mask32v v1z = zsi >= FS::Max( FS::Max( wsi, xsi ), FS::Max( ysi, float32v( 1 ) - sumsi ) );
+        mask32v v1w = wsi >= FS::Max( FS::Max( xsi, ysi ), FS::Max( zsi, float32v( 1 ) - sumsi ) );
+
+        int32v vh1x = FS::MaskedAdd( v1x, xsb, int32v( Primes::X ) );
+        int32v vh1y = FS::MaskedAdd( v1y, ysb, int32v( Primes::Y ) );
+        int32v vh1z = FS::MaskedAdd( v1z, zsb, int32v( Primes::Z ) );
+        int32v vh1w = FS::MaskedAdd( v1w, wsb, int32v( Primes::W ) );
+
+        xsb = vh1x + yLatticeCoordOffset;
+        ysb = vh1y + yLatticeCoordOffset;
+        zsb = vh1z + yLatticeCoordOffset;
+        wsb = vh1w + yLatticeCoordOffset;
+        xsi = FS::MaskedDecrement( v1x, xsi );
+        ysi = FS::MaskedDecrement( v1y, ysi );
+        zsi = FS::MaskedDecrement( v1z, zsi );
+        wsi = FS::MaskedDecrement( v1w, wsi );
+        sumsi = xsi + ysi + zsi + wsi;
+
+        float32v d1x = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), xsi );
+        float32v d1y = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), ysi );
+        float32v d1z = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), zsi );
+        float32v d1w = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), wsi );
+
+        xsi += float32v( 0.2f );
+        ysi += float32v( 0.2f );
+        zsi += float32v( 0.2f );
+        wsi += float32v( 0.2f );
+        sumsi += float32v( 0.8f );
+
+        // 2
+        mask32v v2x = xsi >= FS::Max( FS::Max( ysi, zsi ), FS::Max( wsi, float32v( 1 ) - sumsi ) );
+        mask32v v2y = ysi >= FS::Max( FS::Max( zsi, wsi ), FS::Max( xsi, float32v( 1 ) - sumsi ) );
+        mask32v v2z = zsi >= FS::Max( FS::Max( wsi, xsi ), FS::Max( ysi, float32v( 1 ) - sumsi ) );
+        mask32v v2w = wsi >= FS::Max( FS::Max( xsi, ysi ), FS::Max( zsi, float32v( 1 ) - sumsi ) );
+
+        int32v vh2x = FS::MaskedAdd( v2x, xsb, int32v( Primes::X ) );
+        int32v vh2y = FS::MaskedAdd( v2y, ysb, int32v( Primes::Y ) );
+        int32v vh2z = FS::MaskedAdd( v2z, zsb, int32v( Primes::Z ) );
+        int32v vh2w = FS::MaskedAdd( v2w, wsb, int32v( Primes::W ) );
+
+        xsb = vh2x + zLatticeCoordOffset;
+        ysb = vh2y + zLatticeCoordOffset;
+        zsb = vh2z + zLatticeCoordOffset;
+        wsb = vh2w + zLatticeCoordOffset;
+        xsi = FS::MaskedDecrement( v2x, xsi );
+        ysi = FS::MaskedDecrement( v2y, ysi );
+        zsi = FS::MaskedDecrement( v2z, zsi );
+        wsi = FS::MaskedDecrement( v2w, wsi );
+        sumsi = xsi + ysi + zsi + wsi;
+
+        float32v d2x = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), xsi );
+        float32v d2y = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), ysi );
+        float32v d2z = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), zsi );
+        float32v d2w = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), wsi );
+
+        xsi += float32v( 0.2f );
+        ysi += float32v( 0.2f );
+        zsi += float32v( 0.2f );
+        wsi += float32v( 0.2f );
+        sumsi += float32v( 0.8f );
+
+        // 3
+        mask32v v3x = xsi >= FS::Max( FS::Max( ysi, zsi ), FS::Max( wsi, float32v( 1 ) - sumsi ) );
+        mask32v v3y = ysi >= FS::Max( FS::Max( zsi, wsi ), FS::Max( xsi, float32v( 1 ) - sumsi ) );
+        mask32v v3z = zsi >= FS::Max( FS::Max( wsi, xsi ), FS::Max( ysi, float32v( 1 ) - sumsi ) );
+        mask32v v3w = wsi >= FS::Max( FS::Max( xsi, ysi ), FS::Max( zsi, float32v( 1 ) - sumsi ) );
+
+        int32v vh3x = FS::MaskedAdd( v3x, xsb, int32v( Primes::X ) );
+        int32v vh3y = FS::MaskedAdd( v3y, ysb, int32v( Primes::Y ) );
+        int32v vh3z = FS::MaskedAdd( v3z, zsb, int32v( Primes::Z ) );
+        int32v vh3w = FS::MaskedAdd( v3w, wsb, int32v( Primes::W ) );
+
+        xsb = vh3x + wLatticeCoordOffset;
+        ysb = vh3y + wLatticeCoordOffset;
+        zsb = vh3z + wLatticeCoordOffset;
+        wsb = vh3w + wLatticeCoordOffset;
+        xsi = FS::MaskedDecrement( v3x, xsi );
+        ysi = FS::MaskedDecrement( v3y, ysi );
+        zsi = FS::MaskedDecrement( v3z, zsi );
+        wsi = FS::MaskedDecrement( v3w, wsi );
+        sumsi = xsi + ysi + zsi + wsi;
+
+        float32v d3x = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), xsi );
+        float32v d3y = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), ysi );
+        float32v d3z = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), zsi );
+        float32v d3w = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), wsi );
+
+        xsi += float32v( 0.2f );
+        ysi += float32v( 0.2f );
+        zsi += float32v( 0.2f );
+        wsi += float32v( 0.2f );
+        sumsi += float32v( 0.8f );
+
+        // 4
+        mask32v v4x = xsi >= FS::Max( FS::Max( ysi, zsi ), FS::Max( wsi, float32v( 1 ) - sumsi ) );
+        mask32v v4y = ysi >= FS::Max( FS::Max( zsi, wsi ), FS::Max( xsi, float32v( 1 ) - sumsi ) );
+        mask32v v4z = zsi >= FS::Max( FS::Max( wsi, xsi ), FS::Max( ysi, float32v( 1 ) - sumsi ) );
+        mask32v v4w = wsi >= FS::Max( FS::Max( xsi, ysi ), FS::Max( zsi, float32v( 1 ) - sumsi ) );
+
+        int32v vh4x = FS::MaskedAdd( v4x, xsb, int32v( Primes::X ) );
+        int32v vh4y = FS::MaskedAdd( v4y, ysb, int32v( Primes::Y ) );
+        int32v vh4z = FS::MaskedAdd( v4z, zsb, int32v( Primes::Z ) );
+        int32v vh4w = FS::MaskedAdd( v4w, wsb, int32v( Primes::W ) );
+
+        xsi = FS::MaskedDecrement( v4x, xsi );
+        ysi = FS::MaskedDecrement( v4y, ysi );
+        zsi = FS::MaskedDecrement( v4z, zsi );
+        wsi = FS::MaskedDecrement( v4w, wsi );
+        sumsi = xsi + ysi + zsi + wsi;
+
+        float32v d4x = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), xsi );
+        float32v d4y = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), ysi );
+        float32v d4z = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), zsi );
+        float32v d4w = FS::FMulAdd( sumsi, float32v( 0.309016994374947f ), wsi );
+
+        //float32v g0 = GetGradientDot(  )
+
+        //vec4 h0123 = permute( mod639( vec4( vh0.x, vh1.x, vh2.x, vh3.x ) ), seedVec.x );
+        //h0123 = permute( mod639( h0123 + vec4( vh0.y, vh1.y, vh2.y, vh3.y ) ), seedVec.y );
+        //h0123 = permute( mod639( h0123 + vec4( vh0.z, vh1.z, vh2.z, vh3.z ) ), seedVec.z );
+        //h0123 = pmod639( permute( mod639( h0123 + vec4( vh0.w, vh1.w, vh2.w, vh3.w ) ), seedVec.w ) );
+
+        //float h4 = permute( mod639( vh4.x ), seedVec.x );
+        //h4 = permute( mod639( h4 + vh4.y ), seedVec.y );
+        //h4 = permute( mod639( h4 + vh4.z ), seedVec.z );
+        //h4 = pmod639( permute( mod639( h4 + vh4.w ), seedVec.w ) );
+
+        //vec4 g0 = grad( h0123.x );
+        //vec4 g1 = grad( h0123.y );
+        //vec4 g2 = grad( h0123.z );
+        //vec4 g3 = grad( h0123.w );
+        //vec4 g4 = grad( h4 );
+
+        ///*vec4 norm = inversesqrt(vec4(dot(g0, g0), dot(g1, g1), dot(g2, g2), dot(g3, g3)));
+        //g0 *= norm.x; g1 *= norm.y; g2 *= norm.z; g3 *= norm.w; g4 *= inversesqrt(dot(g4, g4));*/
+
+        //// "Proper" constant is 0.5. 0.6 produces subtle invisible discontinuities, but looks much better.
+        //vec4 a0123 = max( 0.6 - vec4( dot( d0, d0 ), dot( d1, d1 ), dot( d2, d2 ), dot( d3, d3 ) ), 0.0 );
+        //float a4 = max( 0.6 - dot( d4, d4 ), 0.0 );
+        //vec4 r0123 = vec4( dot( d0, g0 ), dot( d1, g1 ), dot( d2, g2 ), dot( d3, g3 ) );
+        //float r4 = dot( d4, g4 );
+        //a0123 *= a0123;
+        //a4 *= a4;
+        //return ( dot( a0123 * a0123, r0123 ) + a4 * a4 * r4 ) * 27.0; // TODO compute tighter normalization constant.
+        return float32v( 0 );
+    }
 };
 
 template<FastSIMD::FeatureSet SIMD>
