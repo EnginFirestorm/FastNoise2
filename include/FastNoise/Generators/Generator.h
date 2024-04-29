@@ -108,6 +108,27 @@ namespace FastNoise
             int xSize,  int ySize,  int zSize, 
             float frequency, int seed ) const = 0;
 
+
+
+                virtual void GenAxes( float* outX, float* outY, float* outZ, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize,
+                              Generator* genX, Generator* genY, Generator* genZ, float frequency, int seed ) const = 0;
+
+                virtual bool Gen3DDomainCheckSimpel( float* genX, float* genY, float* genZ, int seed, int size) const = 0;
+
+                virtual bool Gen3DDomainCheck( float* genX, float* genY, float* genZ, int seed, int size, float biomover, float* biomPower ) const = 0;
+
+                virtual void Gen3DComplexAdd( float* out, float* genX, float* genY, float* genZ, int seed, int size, float power ) const = 0;
+
+                virtual void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ, float* genXoff, float* genYoff, float* genZoff, int seed, int size, Generator* genDomain ) const = 0;
+
+                virtual void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ, 
+                    float* genXoff, float* genYoff, float* genZoff,
+                    int seed, int size, float overlap, float biomover,
+                    Generator* genB, Generator* genPower, Generator* genDomain,
+                    int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const = 0;
+
+
+
         virtual OutputMinMax GenUniformGrid4D( float* out,
             int xStart, int yStart, int zStart, int wStart,
             int xSize,  int ySize,  int zSize,  int wSize,

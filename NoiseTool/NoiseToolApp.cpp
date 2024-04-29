@@ -32,6 +32,7 @@ NoiseToolApp::NoiseToolApp( const Arguments& arguments ) :
     mImGuiIntegrationContext{ NoCreate },
     mImGuiContext{ ImGui::CreateContext() }
 {
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     InitResources();
 
     const Vector2 size = Vector2 { windowSize() } / dpiScaling();
@@ -177,14 +178,13 @@ void NoiseToolApp::drawEvent()
     GL::Renderer::disable( GL::Renderer::Feature::FaceCulling );
 
     mImGuiIntegrationContext.updateApplicationCursor( *this );
-    mImGuiIntegrationContext.drawFrame();
 
+    mImGuiIntegrationContext.drawFrame();
     /* Reset state. Only needed if you want to draw something else with
        different state after. */
     GL::Renderer::enable( GL::Renderer::Feature::DepthTest );
     GL::Renderer::disable( GL::Renderer::Feature::ScissorTest );
     GL::Renderer::disable( GL::Renderer::Feature::Blending );
-
     swapBuffers();
     redraw();
     mFrameTime.nextFrame();

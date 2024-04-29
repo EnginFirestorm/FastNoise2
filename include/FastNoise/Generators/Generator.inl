@@ -175,6 +175,251 @@ public:
         return DoRemaining( noiseOut, totalValues, index, min, max, gen );
     }
 
+    void GenAxes( float* outX, float* outY, float* outZ, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, Generator* genX, Generator* genY, Generator* genZ, float frequency, int seed ) const final
+    {
+        FS_T<FastNoise::Generator, FS>* genXFS = nullptr;
+        if( genX )
+            genXFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genX );
+        FS_T<FastNoise::Generator, FS>* genYFS = nullptr;
+        if( genY )
+			genYFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genY );
+        FS_T<FastNoise::Generator, FS>* genZFS = nullptr;
+        if( genZ )
+			genZFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genZ );
+
+        int32v seedV( seed );
+
+        int32v xIdx( xStart );
+        int32v yIdx( yStart );
+        int32v zIdx( zStart );
+
+        float32v freqV( frequency );
+
+        int32v xSizeV( xSize );
+        int32v xMax = xSizeV + xIdx + int32v( -1 );
+        int32v ySizeV( ySize );
+        int32v yMax = ySizeV + yIdx + int32v( -1 );
+
+        intptr_t totalValues = xSize * ySize * zSize;
+        intptr_t index = 0;
+
+        xIdx += int32v::FS_Incremented();
+
+        AxisReset<true>( xIdx, yIdx, xMax, xSizeV, xSize );
+        AxisReset<true>( yIdx, zIdx, yMax, ySizeV, xSize * ySize );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS_Converti32_f32( xIdx ) * freqV;
+            float32v yPos = FS_Converti32_f32( yIdx ) * freqV;
+            float32v zPos = FS_Converti32_f32( zIdx ) * freqV;
+
+            float32v xOff;
+            float32v yOff;
+            float32v zOff;
+
+            if( genXFS )
+                xOff = genXFS->Gen( seedV, xPos, yPos, zPos );
+            else
+                xOff = float32v( 0.f );
+            if( genYFS )
+                yOff = genYFS->Gen( seedV, xPos, yPos, zPos );
+            else
+                yOff = float32v( 0.f );
+            if( genZFS )
+                zOff = genZFS->Gen( seedV, xPos, yPos, zPos );
+            else
+                zOff = float32v( 0.f );
+
+            FS_Store_f32( &outX[index], xPos + xOff );
+            FS_Store_f32( &outY[index], yPos + yOff );
+            FS_Store_f32( &outZ[index], zPos + zOff );
+
+            index += FS_Size_32();
+            xIdx += int32v( FS_Size_32() );
+
+            AxisReset<false>( xIdx, yIdx, xMax, xSizeV, xSize );
+            AxisReset<false>( yIdx, zIdx, yMax, ySizeV, xSize * ySize );
+        }
+    }
+
+    bool Gen3DDomainCheckSimpel( float* genX, float* genY, float* genZ, int seed, int size ) const final
+    {
+        int32v seedV( seed );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS_Load_f32( &genX[index] );
+            float32v yPos = FS_Load_f32( &genY[index] );
+            float32v zPos = FS_Load_f32( &genZ[index] );
+
+            if( FS_AnyMask_bool( Gen( seedV, xPos, yPos, zPos ) > min ) )
+                return true;
+
+            index += FS_Size_32();
+        }
+        return false;
+    }
+
+    bool Gen3DDomainCheck( float* genX, float* genY, float* genZ, int seed, int size, float biomover, float* biomPower ) const final
+    {
+        int32v seedV( seed );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+        float32v over( biomover );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS_Load_f32( &genX[index] );
+            float32v yPos = FS_Load_f32( &genY[index] );
+            float32v zPos = FS_Load_f32( &genZ[index] );
+            float32v biomPowerV = FS_Load_f32( &biomPower[index] );
+
+            if( FS_AnyMask_bool( Gen( seedV, xPos, yPos, zPos ) > biomPowerV - over ) )
+                return true;
+
+            index += FS_Size_32();
+        }
+    }
+
+    void Gen3DComplexAdd( float* out, float* genX, float* genY, float* genZ, int seed, int size, float power ) const final
+    {
+        int32v seedV( seed );
+        float32v powerV( power );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS_Load_f32( &genX[index] );
+            float32v yPos = FS_Load_f32( &genY[index] );
+            float32v zPos = FS_Load_f32( &genZ[index] );
+
+            FS_Store_f32( &out[index], FS_Load_f32( &out[index] ) + ( Gen( seedV, xPos, yPos, zPos ) * powerV ) );
+
+            index += FS_Size_32();
+        }
+    }
+
+        void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ, float* genXoff, float* genYoff, float* genZoff, int seed, int size, Generator* genDomain) const final
+    {
+        FS_T<FastNoise::Generator, FS>* genDomainFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genDomain );
+
+        int32v seedV( seed );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+        float32v max( 1.f );
+
+        while( index < totalValues )
+        {
+            float32v xPosOff = FS_Load_f32( &genXoff[index] );
+            float32v yPosOff = FS_Load_f32( &genYoff[index] );
+            float32v zPosOff = FS_Load_f32( &genZoff[index] );
+
+            float32v domain = FS_Min_f32(FS_Max_f32( genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff ), min ), max);
+
+            if( FS_AnyMask_bool( domain > min ) )
+            {
+                float32v xPos = FS_Load_f32( &genX[index] );
+                float32v yPos = FS_Load_f32( &genY[index] );
+                float32v zPos = FS_Load_f32( &genZ[index] );
+
+                FS_Store_f32( &noiseOut[index], ( FS_Load_f32( &noiseOut[index] ) + (Gen( seedV, xPos, yPos, zPos ) * domain) ) );
+            }
+
+            index += FS_Size_32();
+        }
+    }
+
+    void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+                       float* genXoff, float* genYoff, float* genZoff,
+                       int seed, int size, float overlap, float biomover,
+                       Generator* genB, Generator* genPower, Generator* genDomain,
+                       int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const final
+    {
+        FS_T<FastNoise::Generator, FS>* genBFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genB );
+        FS_T<FastNoise::Generator, FS>* genPowerFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genPower );
+        FS_T<FastNoise::Generator, FS>* genDomainFS = dynamic_cast<FS_T<FastNoise::Generator, FS>*>( genDomain );
+
+        int32v seedV( seed );
+        float32v overlapV( overlap );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+        float32v over( biomover );
+
+        int32v p( 1 );
+        int32v m( -1 );
+        int32v biomIndexV( biomIndex );
+
+        while( index < totalValues )
+        {
+            float32v xPosOff = FS_Load_f32( &genXoff[index] );
+            float32v yPosOff = FS_Load_f32( &genYoff[index] );
+            float32v zPosOff = FS_Load_f32( &genZoff[index] );
+            float32v biomPowerV = FS_Load_f32( &biomPower[index] );
+
+            float32v domain = FS_Max_f32( genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff ), min );
+
+            if( FS_AnyMask_bool( domain > biomPowerV - over ) )
+            {
+                float32v xPos = FS_Load_f32( &genX[index] );
+                float32v yPos = FS_Load_f32( &genY[index] );
+                float32v zPos = FS_Load_f32( &genZ[index] );
+
+                float32v basePow = genPowerFS->Gen( seedV, xPos, yPos, zPos );
+                float32v powA = FS_Max_f32( overlapV + basePow, min );
+                float32v powB = FS_Max_f32( overlapV - basePow, min );
+
+                float32v out = float32v(0.f );
+
+                if( FS_AnyMask_bool( powA > min ) )
+                {
+                    float32v gen = Gen( seedV, xPos, yPos, zPos );
+                    out += gen * powA;
+                }
+
+                if( FS_AnyMask_bool( powB > min ) )
+                {
+                    float32v gen = genBFS->Gen( seedV, xPos, yPos, zPos );
+                    out += gen * powB;
+                }
+
+                float32v doA = FS_Min_f32( FS_Max_f32( ( biomPowerV - domain + over ), min ), over );
+                float32v doB = FS_Min_f32( FS_Max_f32( ( domain - biomPowerV + over ), min ), over );
+                float32v factor = doA + doB;
+                doA /= factor;
+                doB /= factor;
+
+                FS_Store_f32( &noiseOut[index], ( ( FS_Load_f32( &noiseOut[index] ) * doA ) + ( out * doB ) ) );
+
+                int32v biomSwitchV = FS_Load_i32( &biomSwitch[index] );
+                int32v biomListV = FS_Load_i32( &biomList[index] );
+                mask32v mask = domain >= biomPowerV;
+
+                FS_Store_f32( &biomPower[index], FS_Select_f32( mask, domain, biomPowerV ) );
+                FS_Store_i32( &biomSwitch[index], FS_Select_i32( mask, FS_Select_i32( basePow > min, p, m ), biomSwitchV ) );
+                FS_Store_i32( &biomList[index], FS_Select_i32( mask, biomIndexV, biomListV ) );
+            }
+
+            index += FS_Size_32();
+        }
+    }
+
     FastNoise::OutputMinMax GenUniformGrid4D( float* noiseOut, int xStart, int yStart, int zStart, int wStart, int xSize, int ySize, int zSize, int wSize, float frequency, int seed ) const final
     {
         float32v min( INFINITY );
