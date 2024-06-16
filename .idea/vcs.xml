@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/corrade/4058303168e632aea20ce397235bde29b2363e4d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/glfw/ee35417ab4360e3013468dccf482cde638d6193c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/imgui/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/imnodes/908baf0d8dc41fb30e3d1960b9474fd7e4ee6c01" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/magnum-integration/e0d7933531b1d55ecc5e4f556ebfdd854f7ca330" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/magnum/2928317d0b5122d9af8bb2de27378b04ce8968a2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/$/out/cpm-cache/robinhoodhashing/a190e507b5d23416565d6da9220811363fcbd62c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/corrade/4058303168e632aea20ce397235bde29b2363e4d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/glfw/ee35417ab4360e3013468dccf482cde638d6193c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/imgui/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/imnodes/908baf0d8dc41fb30e3d1960b9474fd7e4ee6c01" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/magnum-integration/e0d7933531b1d55ecc5e4f556ebfdd854f7ca330" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/magnum/2928317d0b5122d9af8bb2de27378b04ce8968a2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/NoiseTool/out/cpm-cache/robinhoodhashing/a190e507b5d23416565d6da9220811363fcbd62c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/out/cpm-cache/imgui/3bc158a0ac509766edea3d405b554750422d3bcc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/out/cpm-cache/imgui/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tests/$/out/cpm-cache/benchmark/133d0772c5e70546e862053d7b7a25d23e4ee76a" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tests/out/cpm-cache/benchmark/133d0772c5e70546e862053d7b7a25d23e4ee76a" vcs="Git" />
+  </component>
+</project>

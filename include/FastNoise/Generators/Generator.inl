@@ -283,11 +283,14 @@ public:
             float32v zPos = FS_Load_f32( &genZ[index] );
             float32v biomPowerV = FS_Load_f32( &biomPower[index] );
 
-            if( FS_AnyMask_bool( Gen( seedV, xPos, yPos, zPos ) > biomPowerV - over ) )
+            float32v domain = Gen( seedV, xPos, yPos, zPos );
+
+            if( FS_AnyMask_bool( domain > (biomPowerV - over) ) )
                 return true;
 
             index += FS_Size_32();
         }
+        return false;
     }
 
     void Gen3DComplexAdd( float* out, float* genX, float* genY, float* genZ, int seed, int size, float power ) const final
@@ -375,7 +378,7 @@ public:
 
             float32v domain = FS_Max_f32( genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff ), min );
 
-            if( FS_AnyMask_bool( domain > biomPowerV - over ) )
+            if( FS_AnyMask_bool( domain > (biomPowerV - over) ) )
             {
                 float32v xPos = FS_Load_f32( &genX[index] );
                 float32v yPos = FS_Load_f32( &genY[index] );

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/NoiseTool/$/$.iml" filepath="$PROJECT_DIR$/NoiseTool/$/$.iml" />
+      <module fileurl="file://$PROJECT_DIR$/out/cpm-cache/imgui/3bc158a0ac509766edea3d405b554750422d3bcc/3bc158a0ac509766edea3d405b554750422d3bcc.iml" filepath="$PROJECT_DIR$/out/cpm-cache/imgui/3bc158a0ac509766edea3d405b554750422d3bcc/3bc158a0ac509766edea3d405b554750422d3bcc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FastNoise2.iml" filepath="$PROJECT_DIR$/.idea/FastNoise2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/out/cpm-cache/imgui/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0.iml" filepath="$PROJECT_DIR$/out/cpm-cache/imgui/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0/a63b2a0925e72bfe54d1e208041f6e55dfb1e6b0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NoiseTool/out/out.iml" filepath="$PROJECT_DIR$/NoiseTool/out/out.iml" />
+    </modules>
+  </component>
+</project>

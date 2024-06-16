@@ -38,11 +38,7 @@
       "displayName": "All",
       "inherits": "noisetool",
       "cacheVariables": {
-        "FASTNOISE2_NOISETOOL": {
-          "value": "True",
-          "type": "BOOL"
-        },
-        "FASTNOISE2_TESTS": {
+        "BUILD_SHARED_LIBS": {
           "value": "True",
           "type": "BOOL"
         }
