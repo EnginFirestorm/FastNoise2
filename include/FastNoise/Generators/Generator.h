@@ -119,6 +119,8 @@ namespace FastNoise
 
                 virtual void Gen3DComplexAdd( float* out, float* genX, float* genY, float* genZ, int seed, int size, float power ) const = 0;
 
+                virtual void Gen3DCompAddWV( float* out, float* domain, float* genX, float* genY, float* genZ, int seed, int size, float power ) const = 0;
+
                 virtual void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ, float* genXoff, float* genYoff, float* genZoff, int seed, int size, Generator* genDomain ) const = 0;
 
                 virtual void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ, 

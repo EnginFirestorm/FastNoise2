@@ -7,7 +7,7 @@
 
 # =============================================================================
 # Project: FastNoise2
-# Configurations: Debug
+# Configurations: 
 # =============================================================================
 # =============================================================================
 
@@ -22,7 +22,7 @@ rule CUSTOM_COMMAND
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__FastNoise_unscanned_Debug
+rule CXX_COMPILER__FastNoise_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}C:\Microsoft\AndroidNDK\android-ndk-r23c\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=x86_64-none-linux-android26 --gcc-toolchain=C:/Microsoft/AndroidNDK/android-ndk-r23c/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Microsoft/AndroidNDK/android-ndk-r23c/toolchains/llvm/prebuilt/windows-x86_64/sysroot $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -30,11 +30,11 @@ rule CXX_COMPILER__FastNoise_unscanned_Debug
 
 
 #############################################
-# Rule for linking CXX shared library.
+# Rule for linking CXX static library.
 
-rule CXX_SHARED_LIBRARY_LINKER__FastNoise_Debug
-  command = C:\windows\system32\cmd.exe /C "$PRE_LINK && C:\Microsoft\AndroidNDK\android-ndk-r23c\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=x86_64-none-linux-android26 --gcc-toolchain=C:/Microsoft/AndroidNDK/android-ndk-r23c/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Microsoft/AndroidNDK/android-ndk-r23c/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
-  description = Linking CXX shared library $TARGET_FILE
+rule CXX_STATIC_LIBRARY_LINKER__FastNoise_
+  command = C:\windows\system32\cmd.exe /C "$PRE_LINK && "C:\Program Files\CMake\bin\cmake.exe" -E rm -f $TARGET_FILE && C:\Microsoft\AndroidNDK\android-ndk-r23c\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-ar.exe qc $TARGET_FILE $LINK_FLAGS $in && C:\Microsoft\AndroidNDK\android-ndk-r23c\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-ranlib.exe $TARGET_FILE && $POST_BUILD"
+  description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
 

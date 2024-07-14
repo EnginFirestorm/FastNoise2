@@ -56,9 +56,10 @@ if(_IMPORT_PREFIX STREQUAL "/")
 endif()
 
 # Create imported target FastNoise2::FastNoise
-add_library(FastNoise2::FastNoise SHARED IMPORTED)
+add_library(FastNoise2::FastNoise STATIC IMPORTED)
 
 set_target_properties(FastNoise2::FastNoise PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS "FASTNOISE_STATIC_LIB"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include;${_IMPORT_PREFIX}/include"
 )
 

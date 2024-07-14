@@ -285,7 +285,7 @@ public:
 
             float32v domain = Gen( seedV, xPos, yPos, zPos );
 
-            if( FS_AnyMask_bool( domain > (biomPowerV - over) ) )
+            if( FS_AnyMask_bool( ( domain + over ) > biomPowerV ) )
                 return true;
 
             index += FS_Size_32();
@@ -308,6 +308,30 @@ public:
             float32v zPos = FS_Load_f32( &genZ[index] );
 
             FS_Store_f32( &out[index], FS_Load_f32( &out[index] ) + ( Gen( seedV, xPos, yPos, zPos ) * powerV ) );
+
+            index += FS_Size_32();
+        }
+    }
+
+        void Gen3DCompAddWV( float* out, float* domain, float* genX, float* genY, float* genZ, int seed, int size, float power ) const final
+    {
+        int32v seedV( seed );
+        float32v powerV( power );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+        float32v min( 0.f );
+        float32v p( 1.f );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS_Load_f32( &genX[index] );
+            float32v yPos = FS_Load_f32( &genY[index] );
+            float32v zPos = FS_Load_f32( &genZ[index] );
+
+            mask32v mask = FS_Load_f32( &domain[index] ) <= min;
+            float32v gen = FS_Load_f32( &out[index] ) + ( Gen( seedV, xPos, yPos, zPos ) * powerV );
+            FS_Store_f32( &out[index], FS_Select_f32( mask, p, gen ) );
 
             index += FS_Size_32();
         }
@@ -376,9 +400,9 @@ public:
             float32v zPosOff = FS_Load_f32( &genZoff[index] );
             float32v biomPowerV = FS_Load_f32( &biomPower[index] );
 
-            float32v domain = FS_Max_f32( genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff ), min );
+            float32v domain = genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff );
 
-            if( FS_AnyMask_bool( domain > (biomPowerV - over) ) )
+            if( FS_AnyMask_bool( ( domain + over ) > biomPowerV ) )
             {
                 float32v xPos = FS_Load_f32( &genX[index] );
                 float32v yPos = FS_Load_f32( &genY[index] );
@@ -402,17 +426,13 @@ public:
                     out += gen * powB;
                 }
 
-                float32v doA = FS_Min_f32( FS_Max_f32( ( biomPowerV - domain + over ), min ), over );
-                float32v doB = FS_Min_f32( FS_Max_f32( ( domain - biomPowerV + over ), min ), over );
-                float32v factor = doA + doB;
-                doA /= factor;
-                doB /= factor;
+                float32v factor = FS_Min_f32( FS_Max_f32( ( domain + over ) - biomPowerV, min ), over ) / over;
 
-                FS_Store_f32( &noiseOut[index], ( ( FS_Load_f32( &noiseOut[index] ) * doA ) + ( out * doB ) ) );
+                FS_Store_f32( &noiseOut[index], ( FS_Load_f32( &noiseOut[index] ) + ( out * factor ) ) );
 
                 int32v biomSwitchV = FS_Load_i32( &biomSwitch[index] );
                 int32v biomListV = FS_Load_i32( &biomList[index] );
-                mask32v mask = domain >= biomPowerV;
+                mask32v mask = domain > biomPowerV;
 
                 FS_Store_f32( &biomPower[index], FS_Select_f32( mask, domain, biomPowerV ) );
                 FS_Store_i32( &biomSwitch[index], FS_Select_i32( mask, FS_Select_i32( basePow > min, p, m ), biomSwitchV ) );

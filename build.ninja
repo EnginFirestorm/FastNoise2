@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: FastNoise2
-# Configurations: Debug
+# Configurations: 
 # =============================================================================
 
 #############################################
@@ -20,11 +20,6 @@
 
 ninja_required_version = 1.5
 
-
-#############################################
-# Set configuration variable for custom commands.
-
-CONFIGURATION = Debug
 # =============================================================================
 # Include auxiliary files.
 
@@ -112,7 +107,7 @@ build install/strip: phony CMakeFiles/install/strip.util
 # =============================================================================
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target FastNoise
+# Object build statements for STATIC_LIBRARY target FastNoise
 
 
 #############################################
@@ -120,146 +115,142 @@ build install/strip: phony CMakeFiles/install/strip.util
 
 build cmake_object_order_depends_target_FastNoise: phony || .
 
-build src/CMakeFiles/FastNoise.dir/FastNoise/Metadata.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastNoise/Metadata.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastNoise/Metadata.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastNoise/Metadata.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastNoise\Metadata.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastNoise
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastNoise/SmartNode.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastNoise/SmartNode.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastNoise/SmartNode.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastNoise/SmartNode.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastNoise\SmartNode.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastNoise
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastNoise/FastNoise_C.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastNoise/FastNoise_C.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastNoise/FastNoise_C.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastNoise/FastNoise_C.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastNoise\FastNoise_C.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastNoise
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX2.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_AVX2.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX2.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_AVX2.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_AVX2.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -mavx2 -mfma
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -mavx2 -mfma
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX512.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_AVX512.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX512.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_AVX512.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_AVX512.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -mavx512f -mavx512dq -mfma
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -mavx512f -mavx512dq -mfma
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_Scalar.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_Scalar.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_Scalar.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_Scalar.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_Scalar.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE2.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE2.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE2.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE2.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_SSE2.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE3.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE3.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE3.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE3.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_SSE3.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -msse3
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -msse3
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE41.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE41.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE41.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE41.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_SSE41.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -msse4.1
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -msse4.1
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE42.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE42.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE42.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSE42.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_SSE42.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -msse4.2
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -msse4.2
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
-build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSSE3.cpp.o: CXX_COMPILER__FastNoise_unscanned_Debug D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSSE3.cpp || cmake_object_order_depends_target_FastNoise
-  DEFINES = -DFASTNOISE_EXPORT
+build src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSSE3.cpp.o: CXX_COMPILER__FastNoise_unscanned_ D$:/FastNoise2/src/FastSIMD/FastSIMD_Level_SSSE3.cpp || cmake_object_order_depends_target_FastNoise
+  DEFINES = -DFASTNOISE_STATIC_LIB
   DEP_FILE = src\CMakeFiles\FastNoise.dir\FastSIMD\FastSIMD_Level_SSSE3.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -mssse3
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=gnu++17 -fPIC -ffast-math -fno-stack-protector -mssse3
   INCLUDES = -ID:/FastNoise2/include
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   OBJECT_FILE_DIR = src\CMakeFiles\FastNoise.dir\FastSIMD
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_PDB = src\libFastNoise.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target FastNoise
+# Link build statements for STATIC_LIBRARY target FastNoise
 
 
 #############################################
-# Link the shared library src\libFastNoiseD.so
+# Link the static library src\libFastNoise.a
 
-build src/libFastNoiseD.so: CXX_SHARED_LIBRARY_LINKER__FastNoise_Debug src/CMakeFiles/FastNoise.dir/FastNoise/Metadata.cpp.o src/CMakeFiles/FastNoise.dir/FastNoise/SmartNode.cpp.o src/CMakeFiles/FastNoise.dir/FastNoise/FastNoise_C.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX2.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX512.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_Scalar.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE2.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE3.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE41.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE42.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSSE3.cpp.o
-  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info
-  LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments
-  LINK_LIBRARIES = -latomic -lm
+build src/libFastNoise.a: CXX_STATIC_LIBRARY_LINKER__FastNoise_ src/CMakeFiles/FastNoise.dir/FastNoise/Metadata.cpp.o src/CMakeFiles/FastNoise.dir/FastNoise/SmartNode.cpp.o src/CMakeFiles/FastNoise.dir/FastNoise/FastNoise_C.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX2.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_AVX512.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_Scalar.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE2.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE3.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE41.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSE42.cpp.o src/CMakeFiles/FastNoise.dir/FastSIMD/FastSIMD_Level_SSSE3.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security
   OBJECT_DIR = src\CMakeFiles\FastNoise.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  SONAME = libFastNoiseD.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = src\libFastNoiseD.pdb
-  TARGET_FILE = src\libFastNoiseD.so
-  TARGET_PDB = src\libFastNoiseD.pdb
+  TARGET_COMPILE_PDB = src\CMakeFiles\FastNoise.dir\FastNoise.pdb
+  TARGET_FILE = src\libFastNoise.a
+  TARGET_PDB = src\libFastNoise.pdb
 
 
 #############################################
@@ -330,9 +321,9 @@ build src/install/strip: phony src/CMakeFiles/install/strip.util
 # =============================================================================
 # Target aliases.
 
-build FastNoise: phony src/libFastNoiseD.so
+build FastNoise: phony src/libFastNoise.a
 
-build libFastNoiseD.so: phony src/libFastNoiseD.so
+build libFastNoise.a: phony src/libFastNoise.a
 
 # =============================================================================
 # Folder targets.
@@ -349,7 +340,7 @@ build all: phony src/all
 #############################################
 # Folder: D:/FastNoise2/src
 
-build src/all: phony src/libFastNoiseD.so
+build src/all: phony src/libFastNoise.a
 
 # =============================================================================
 # Built-in targets
