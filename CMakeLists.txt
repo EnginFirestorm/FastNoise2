@@ -1,7 +1,7 @@
 # CMakeList.txt : CMake project for FastNoise2
 cmake_minimum_required(VERSION 3.7.1)
 
-project(FastNoise2 VERSION 0.10.0)
+project(FastNoise2 VERSION 0.10.1)
 set(CMAKE_CXX_STANDARD 17)
 
 #set(CMAKE_SYSTEM_NAME Linux)
@@ -46,7 +46,7 @@ if (NOT DEFINED FASTNOISE2_STANDALONE_PROJECT)
 endif()
 
 # Build DLL
-#set(BUILD_SHARED_LIBS ON) 
+set(BUILD_SHARED_LIBS ON) 
 
 option(FASTNOISE2_NOISETOOL "Build NoiseTool application" ${FASTNOISE2_STANDALONE_PROJECT})
 option(FASTNOISE2_TESTS "Build tests" OFF)

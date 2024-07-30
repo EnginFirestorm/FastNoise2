@@ -111,7 +111,7 @@ namespace FastNoise
 
 
                 virtual void GenAxes( float* outX, float* outY, float* outZ, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize,
-                              Generator* genX, Generator* genY, Generator* genZ, float frequency, int seed ) const = 0;
+                              Generator* genX, Generator* genY, Generator* genZ, float frequencyX, float frequencyY, float frequencyZ, int seed ) const = 0;
 
                 virtual bool Gen3DDomainCheckSimpel( float* genX, float* genY, float* genZ, int seed, int size) const = 0;
 

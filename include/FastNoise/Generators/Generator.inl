@@ -175,7 +175,7 @@ public:
         return DoRemaining( noiseOut, totalValues, index, min, max, gen );
     }
 
-    void GenAxes( float* outX, float* outY, float* outZ, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, Generator* genX, Generator* genY, Generator* genZ, float frequency, int seed ) const final
+    void GenAxes( float* outX, float* outY, float* outZ, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, Generator* genX, Generator* genY, Generator* genZ, float frequencyX, float frequencyY, float frequencyZ, int seed ) const final
     {
         FS_T<FastNoise::Generator, FS>* genXFS = nullptr;
         if( genX )
@@ -193,7 +193,9 @@ public:
         int32v yIdx( yStart );
         int32v zIdx( zStart );
 
-        float32v freqV( frequency );
+        float32v freqVX( frequencyX );
+        float32v freqVY( frequencyY );
+        float32v freqVZ( frequencyZ );
 
         int32v xSizeV( xSize );
         int32v xMax = xSizeV + xIdx + int32v( -1 );
@@ -210,9 +212,9 @@ public:
 
         while( index < totalValues )
         {
-            float32v xPos = FS_Converti32_f32( xIdx ) * freqV;
-            float32v yPos = FS_Converti32_f32( yIdx ) * freqV;
-            float32v zPos = FS_Converti32_f32( zIdx ) * freqV;
+            float32v xPos = FS_Converti32_f32( xIdx ) * freqVX;
+            float32v yPos = FS_Converti32_f32( yIdx ) * freqVY;
+            float32v zPos = FS_Converti32_f32( zIdx ) * freqVZ;
 
             float32v xOff;
             float32v yOff;
