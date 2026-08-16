@@ -165,6 +165,18 @@ class FastSIMD::DispatchClass<FastNoise::Clamp, SIMD> final : public virtual Fas
     }
 };
 
+// The library builds with /fp:fast / -ffast-math, which LICENSES the compiler
+// to contract mul+add into one FMA inside a function - the primitive chain
+// cannot be contracted because its mul and add sit behind a virtual call
+// boundary. Caught by FastNoise.BitEqual.ScaleBiasMatchesChain as a 1-ulp
+// drift; contraction is therefore switched off for exactly this kernel.
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma fp_contract( off )
+#elif defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize( "fp-contract=off" )
+#endif
+
 template<FastSIMD::FeatureSet SIMD>
 class FastSIMD::DispatchClass<FastNoise::ScaleBias, SIMD> final : public virtual FastNoise::ScaleBias, public DispatchClass<FastNoise::Generator, SIMD>
 {
@@ -173,11 +185,20 @@ class FastSIMD::DispatchClass<FastNoise::ScaleBias, SIMD> final : public virtual
     template<typename... P>
     FS_FORCEINLINE float32v GenT( int32v seed, P... pos ) const
     {
+#if defined(__clang__)
+#pragma clang fp contract( off )
+#endif
         // Two separate ops on purpose - see the bit-parity note at the top.
         float32v scaled = this->GetSourceValue( mSource, seed, pos... ) * this->GetSourceValue( mScale, seed, pos... );
         return scaled + this->GetSourceValue( mBias, seed, pos... );
     }
 };
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma fp_contract( on )
+#elif defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
 
 template<FastSIMD::FeatureSet SIMD>
 class FastSIMD::DispatchClass<FastNoise::Curve, SIMD> final : public virtual FastNoise::Curve, public DispatchClass<FastNoise::Generator, SIMD>
