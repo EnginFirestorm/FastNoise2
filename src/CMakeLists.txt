@@ -86,10 +86,15 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}"
         target_compile_options(FastSIMD_FastNoise PRIVATE -fno-stack-protector -Wno-nan-infinity-disabled)
     endif()
 
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        target_compile_options(FastSIMD_FastNoise PRIVATE -mno-vzeroupper)
-    else()
-        target_compile_options(FastSIMD_FastNoise PRIVATE -mllvm -x86-use-vzeroupper=0)        
+    # vzeroupper only exists on x86. Clang quietly ignores the LLVM flag when
+    # targeting ARM, but aarch64 GCC rejects -mno-vzeroupper outright and fails
+    # the Linux arm64 cross build - so gate both on the target architecture.
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64|i[3-6]86)$")
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+            target_compile_options(FastSIMD_FastNoise PRIVATE -mno-vzeroupper)
+        else()
+            target_compile_options(FastSIMD_FastNoise PRIVATE -mllvm -x86-use-vzeroupper=0)
+        endif()
     endif()
 endif()
 

@@ -432,6 +432,217 @@ public:
         return StoreRemaining( noiseOut, totalValues, index, min, max, gen );
     }
 
+    // --- PorismDIMsWorldGenerator extension methods (contract in Generator.h) -
+    // `size` is lane-padded by the caller and every array carries at least
+    // ElementCount floats of slack past it, so these loops step whole registers
+    // and need no remainder pass.
+
+    bool Gen3DDomainCheckSimpel( float* genX, float* genY, float* genZ, int seed, int size ) const final
+    {
+        ScopeExitx86ZeroUpper zeroUpper;
+        int32v seedV( seed );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS::Load<float32v>( &genX[index] );
+            float32v yPos = FS::Load<float32v>( &genY[index] );
+            float32v zPos = FS::Load<float32v>( &genZ[index] );
+
+            if( FS::AnyMask( Gen( seedV, xPos, yPos, zPos ) > min ) )
+                return true;
+
+            index += int32v::ElementCount;
+        }
+        return false;
+    }
+
+    bool Gen3DDomainCheck( float* genX, float* genY, float* genZ, int seed, int size, float biomover, float* biomPower ) const final
+    {
+        ScopeExitx86ZeroUpper zeroUpper;
+        int32v seedV( seed );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v over( biomover );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS::Load<float32v>( &genX[index] );
+            float32v yPos = FS::Load<float32v>( &genY[index] );
+            float32v zPos = FS::Load<float32v>( &genZ[index] );
+            float32v biomPowerV = FS::Load<float32v>( &biomPower[index] );
+
+            float32v domain = Gen( seedV, xPos, yPos, zPos );
+
+            if( FS::AnyMask( ( domain + over ) > biomPowerV ) )
+                return true;
+
+            index += int32v::ElementCount;
+        }
+        return false;
+    }
+
+    void Gen3DComplexAdd( float* out, float* genX, float* genY, float* genZ, int seed, int size, float power ) const final
+    {
+        ScopeExitx86ZeroUpper zeroUpper;
+        int32v seedV( seed );
+        float32v powerV( power );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS::Load<float32v>( &genX[index] );
+            float32v yPos = FS::Load<float32v>( &genY[index] );
+            float32v zPos = FS::Load<float32v>( &genZ[index] );
+
+            FS::Store( &out[index], FS::Load<float32v>( &out[index] ) + ( Gen( seedV, xPos, yPos, zPos ) * powerV ) );
+
+            index += int32v::ElementCount;
+        }
+    }
+
+    void Gen3DCompAddWV( float* out, float* domain, float* genX, float* genY, float* genZ, int seed, int size, float power ) const final
+    {
+        ScopeExitx86ZeroUpper zeroUpper;
+        int32v seedV( seed );
+        float32v powerV( power );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+        float32v p( 1.f );
+
+        while( index < totalValues )
+        {
+            float32v xPos = FS::Load<float32v>( &genX[index] );
+            float32v yPos = FS::Load<float32v>( &genY[index] );
+            float32v zPos = FS::Load<float32v>( &genZ[index] );
+
+            mask32v mask = FS::Load<float32v>( &domain[index] ) <= min;
+            float32v gen = FS::Load<float32v>( &out[index] ) + ( Gen( seedV, xPos, yPos, zPos ) * powerV );
+            FS::Store( &out[index], FS::Select( mask, p, gen ) );
+
+            index += int32v::ElementCount;
+        }
+    }
+
+    void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ, float* genXoff, float* genYoff, float* genZoff, int seed, int size, Generator* genDomain ) const final
+    {
+        ScopeExitx86ZeroUpper zeroUpper;
+        auto genDomainFS = dynamic_cast<VoidPtrStorageType>( genDomain );
+
+        int32v seedV( seed );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+        float32v max( 1.f );
+
+        while( index < totalValues )
+        {
+            float32v xPosOff = FS::Load<float32v>( &genXoff[index] );
+            float32v yPosOff = FS::Load<float32v>( &genYoff[index] );
+            float32v zPosOff = FS::Load<float32v>( &genZoff[index] );
+
+            float32v domain = FS::Min( FS::Max( genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff ), min ), max );
+
+            if( FS::AnyMask( domain > min ) )
+            {
+                float32v xPos = FS::Load<float32v>( &genX[index] );
+                float32v yPos = FS::Load<float32v>( &genY[index] );
+                float32v zPos = FS::Load<float32v>( &genZ[index] );
+
+                FS::Store( &noiseOut[index], FS::Load<float32v>( &noiseOut[index] ) + ( Gen( seedV, xPos, yPos, zPos ) * domain ) );
+            }
+
+            index += int32v::ElementCount;
+        }
+    }
+
+    void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+                       float* genXoff, float* genYoff, float* genZoff,
+                       int seed, int size, float overlap, float biomover,
+                       Generator* genB, Generator* genPower, Generator* genDomain,
+                       int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const final
+    {
+        ScopeExitx86ZeroUpper zeroUpper;
+        auto genBFS = dynamic_cast<VoidPtrStorageType>( genB );
+        auto genPowerFS = dynamic_cast<VoidPtrStorageType>( genPower );
+        auto genDomainFS = dynamic_cast<VoidPtrStorageType>( genDomain );
+
+        int32v seedV( seed );
+        float32v overlapV( overlap );
+
+        intptr_t totalValues = size;
+        intptr_t index = 0;
+
+        float32v min( 0.f );
+        float32v over( biomover );
+
+        int32v p( 1 );
+        int32v m( -1 );
+        int32v biomIndexV( biomIndex );
+
+        while( index < totalValues )
+        {
+            float32v xPosOff = FS::Load<float32v>( &genXoff[index] );
+            float32v yPosOff = FS::Load<float32v>( &genYoff[index] );
+            float32v zPosOff = FS::Load<float32v>( &genZoff[index] );
+            float32v biomPowerV = FS::Load<float32v>( &biomPower[index] );
+
+            float32v domain = genDomainFS->Gen( seedV, xPosOff, yPosOff, zPosOff );
+
+            if( FS::AnyMask( ( domain + over ) > biomPowerV ) )
+            {
+                float32v xPos = FS::Load<float32v>( &genX[index] );
+                float32v yPos = FS::Load<float32v>( &genY[index] );
+                float32v zPos = FS::Load<float32v>( &genZ[index] );
+
+                float32v basePow = genPowerFS->Gen( seedV, xPos, yPos, zPos );
+                float32v powA = FS::Max( overlapV + basePow, min );
+                float32v powB = FS::Max( overlapV - basePow, min );
+
+                float32v out( 0.f );
+
+                if( FS::AnyMask( powA > min ) )
+                {
+                    float32v gen = Gen( seedV, xPos, yPos, zPos );
+                    out += gen * powA;
+                }
+
+                if( FS::AnyMask( powB > min ) )
+                {
+                    float32v gen = genBFS->Gen( seedV, xPos, yPos, zPos );
+                    out += gen * powB;
+                }
+
+                float32v factor = FS::Min( FS::Max( ( domain + over ) - biomPowerV, min ), over ) / over;
+
+                FS::Store( &noiseOut[index], ( FS::Load<float32v>( &noiseOut[index] ) + ( out * factor ) ) );
+
+                int32v biomSwitchV = FS::Load<int32v>( &biomSwitch[index] );
+                int32v biomListV = FS::Load<int32v>( &biomList[index] );
+                mask32v mask = domain > biomPowerV;
+
+                FS::Store( &biomPower[index], FS::Select( mask, domain, biomPowerV ) );
+                FS::Store( &biomSwitch[index], FS::Select( mask, FS::Select( basePow > min, p, m ), biomSwitchV ) );
+                FS::Store( &biomList[index], FS::Select( mask, biomIndexV, biomListV ) );
+            }
+
+            index += int32v::ElementCount;
+        }
+    }
+
 private:
     struct ScopeExitx86ZeroUpper
     {

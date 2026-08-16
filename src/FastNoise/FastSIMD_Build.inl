@@ -78,6 +78,12 @@ static_assert( std::is_final_v<FastSIMD::DispatchClass<CLASS, FastSIMD::FeatureS
 #include <FastNoise/Generators/Blends.inl>
 #endif
 
+#ifdef FASTSIMD_INCLUDE_HEADER_ONLY
+#include <FastNoise/Generators/HeightMap.h>
+#else
+#include <FastNoise/Generators/HeightMap.inl>
+#endif
+
 // Nodes
 // Order is important!
 // Always add to bottom of list,
@@ -141,3 +147,5 @@ FASTNOISE_REGISTER_NODE( RemoveDimension );
 
 FASTNOISE_REGISTER_NODE( Modulus );
 FASTNOISE_REGISTER_NODE( DomainRotatePlane );
+
+FASTNOISE_REGISTER_NODE( HeightMap );

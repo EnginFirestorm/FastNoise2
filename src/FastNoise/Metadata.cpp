@@ -21,11 +21,11 @@ constexpr static std::nullptr_t gMetadataVectorSize = nullptr; // Invalid
 // Setting these values avoids needless vector resizing and oversizing on startup
 // Sadly there is no way to automate this as they fill up as part of static init
 template<>
-constexpr size_t gMetadataVectorSize<const Metadata*> = 47;
+constexpr size_t gMetadataVectorSize<const Metadata*> = 48;
 template<>
-constexpr size_t gMetadataVectorSize<const char*> = 93;
+constexpr size_t gMetadataVectorSize<const char*> = 104;
 template<>
-constexpr size_t gMetadataVectorSize<Metadata::MemberVariable> = 93;
+constexpr size_t gMetadataVectorSize<Metadata::MemberVariable> = 98;
 template<>
 constexpr size_t gMetadataVectorSize<Metadata::MemberNodeLookup> = 32;
 template<>

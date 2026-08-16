@@ -428,6 +428,61 @@ namespace FastNoise
          */
         virtual float GenSingle4D( float x, float y, float z, float w, int seed ) const = 0;
 
+        /* ---------------------------------------------------------------------
+         * PorismDIMsWorldGenerator extension methods.
+         *
+         * These fuse that world generator's per-batch biome merge into the noise
+         * library, so a batch is walked once instead of once per biome per stage.
+         * Upstream FastNoise2 does not have them.
+         *
+         * Shared contract for every method below:
+         *  - Positions arrive PRE-SCALED - the caller folds its frequency into the
+         *    position arrays, so no per-node Feature Scale is applied on top.
+         *  - `size` is a lane-padded element count. Every array must have at least
+         *    `ElementCount` floats of slack past `size`: the loops step whole
+         *    registers and write into that gap.
+         *  - Sign convention: > 0 means air / biome present, <= 0 means solid /
+         *    absent.
+         * ------------------------------------------------------------------ */
+
+        /** @brief True if this generator is > 0 anywhere in the batch. Whole-batch
+         *  early-out probe used to skip biomes that cannot contribute. */
+        virtual bool Gen3DDomainCheckSimpel( float* genX, float* genY, float* genZ,
+            int seed, int size ) const = 0;
+
+        /** @brief As Gen3DDomainCheckSimpel, but a biome only counts as present
+         *  where `domain + biomover` beats the strength an earlier biome already
+         *  claimed in @p biomPower. */
+        virtual bool Gen3DDomainCheck( float* genX, float* genY, float* genZ,
+            int seed, int size, float biomover, float* biomPower ) const = 0;
+
+        /** @brief `out += Gen( pos ) * power` across the batch. */
+        virtual void Gen3DComplexAdd( float* out, float* genX, float* genY, float* genZ,
+            int seed, int size, float power ) const = 0;
+
+        /** @brief As Gen3DComplexAdd, but cells no biome claimed (`domain <= 0`)
+         *  are forced to 1 (air) instead of accumulating. Runs last, once every
+         *  biome has contributed. */
+        virtual void Gen3DCompAddWV( float* out, float* domain, float* genX, float* genY, float* genZ,
+            int seed, int size, float power ) const = 0;
+
+        /** @brief Adds this generator weighted by @p genDomain clamped to [0,1],
+         *  sampling the domain at the warped positions and this node at the
+         *  unwarped ones. */
+        virtual void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+            float* genXoff, float* genYoff, float* genZoff,
+            int seed, int size, Generator* genDomain ) const = 0;
+
+        /** @brief Full dual-generator biome merge: blends this node (A) with
+         *  @p genB by the sign of @p genPower, weights the result by the domain
+         *  falloff, and records the winning biome into @p biomPower /
+         *  @p biomSwitch / @p biomList. */
+        virtual void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+            float* genXoff, float* genYoff, float* genZoff,
+            int seed, int size, float overlap, float biomover,
+            Generator* genB, Generator* genPower, Generator* genDomain,
+            int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const = 0;
+
     protected:
         template<typename T>
         void SetSourceMemberVariable( BaseSource<T>& memberVariable, SmartNodeArg<T> gen )
