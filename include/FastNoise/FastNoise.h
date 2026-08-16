@@ -14,6 +14,7 @@
 #include "Generators/Modifiers.h"
 #include "Generators/Blends.h"
 #include "Generators/HeightMap.h"
+#include "Generators/PorismNodes.h"
 
 namespace FastNoise
 {

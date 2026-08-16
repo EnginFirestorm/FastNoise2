@@ -84,6 +84,12 @@ static_assert( std::is_final_v<FastSIMD::DispatchClass<CLASS, FastSIMD::FeatureS
 #include <FastNoise/Generators/HeightMap.inl>
 #endif
 
+#ifdef FASTSIMD_INCLUDE_HEADER_ONLY
+#include <FastNoise/Generators/PorismNodes.h>
+#else
+#include <FastNoise/Generators/PorismNodes.inl>
+#endif
+
 // Nodes
 // Order is important!
 // Always add to bottom of list,
@@ -149,3 +155,15 @@ FASTNOISE_REGISTER_NODE( Modulus );
 FASTNOISE_REGISTER_NODE( DomainRotatePlane );
 
 FASTNOISE_REGISTER_NODE( HeightMap );
+
+FASTNOISE_REGISTER_NODE( FractalBillow );
+FASTNOISE_REGISTER_NODE( FractalFBmNormalized );
+FASTNOISE_REGISTER_NODE( FractalHybridMulti );
+FASTNOISE_REGISTER_NODE( BiasGain );
+FASTNOISE_REGISTER_NODE( Threshold );
+FASTNOISE_REGISTER_NODE( Clamp );
+FASTNOISE_REGISTER_NODE( ScaleBias );
+FASTNOISE_REGISTER_NODE( Curve );
+FASTNOISE_REGISTER_NODE( BoxDomain );
+FASTNOISE_REGISTER_NODE( CellularValueSimple );
+FASTNOISE_REGISTER_NODE( CellularDistanceSimple );
