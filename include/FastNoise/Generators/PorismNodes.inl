@@ -707,3 +707,196 @@ class FastSIMD::DispatchClass<FastNoise::BoxDomain, SIMD> final : public virtual
         return haveAny ? acc : float32v( 0 );
     }
 };
+
+template<FastSIMD::FeatureSet SIMD>
+class FastSIMD::DispatchClass<FastNoise::Slope, SIMD> final : public virtual FastNoise::Slope, public DispatchClass<FastNoise::Generator, SIMD>
+{
+    // One-sided differences: 1 + dimensions source evaluations per sample.
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y ) const
+    {
+        float32v h( mStepSize );
+        float32v invH( 1.0f / mStepSize );
+        float32v n = this->GetSourceValue( mSource, seed, x, y );
+        float32v dx = ( this->GetSourceValue( mSource, seed, x + h, y ) - n ) * invH;
+        float32v dy = ( this->GetSourceValue( mSource, seed, x, y + h ) - n ) * invH;
+        return FS::Sqrt( FS::FMulAdd( dx, dx, dy * dy ) );
+    }
+
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y, float32v z ) const
+    {
+        float32v h( mStepSize );
+        float32v invH( 1.0f / mStepSize );
+        float32v n = this->GetSourceValue( mSource, seed, x, y, z );
+        float32v dx = ( this->GetSourceValue( mSource, seed, x + h, y, z ) - n ) * invH;
+        float32v dy = ( this->GetSourceValue( mSource, seed, x, y + h, z ) - n ) * invH;
+        float32v dz = ( this->GetSourceValue( mSource, seed, x, y, z + h ) - n ) * invH;
+        return FS::Sqrt( FS::FMulAdd( dx, dx, FS::FMulAdd( dy, dy, dz * dz ) ) );
+    }
+
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y, float32v z, float32v w ) const
+    {
+        float32v h( mStepSize );
+        float32v invH( 1.0f / mStepSize );
+        float32v n = this->GetSourceValue( mSource, seed, x, y, z, w );
+        float32v dx = ( this->GetSourceValue( mSource, seed, x + h, y, z, w ) - n ) * invH;
+        float32v dy = ( this->GetSourceValue( mSource, seed, x, y + h, z, w ) - n ) * invH;
+        float32v dz = ( this->GetSourceValue( mSource, seed, x, y, z + h, w ) - n ) * invH;
+        float32v dw = ( this->GetSourceValue( mSource, seed, x, y, z, w + h ) - n ) * invH;
+        return FS::Sqrt( FS::FMulAdd( dx, dx, FS::FMulAdd( dy, dy, FS::FMulAdd( dz, dz, dw * dw ) ) ) );
+    }
+};
+
+template<FastSIMD::FeatureSet SIMD>
+class FastSIMD::DispatchClass<FastNoise::Spheres, SIMD> final : public virtual FastNoise::Spheres, public DispatchClass<FastNoise::VariableRange<FastNoise::ScalableGenerator>, SIMD>
+{
+    FASTNOISE_IMPL_GEN_T;
+
+    template<typename... P>
+    FS_FORCEINLINE float32v GenT( int32v seed, P... pos ) const
+    {
+        this->ScalePositions( pos... );
+
+        float32v distSqr( 0 );
+        ( ( distSqr = FS::FMulAdd( pos, pos, distSqr ) ), ... );
+        float32v dist = FS::Sqrt( distSqr );
+
+        float32v distFrac = dist - FS::Floor( dist );
+        float32v nearest = FS::Min( distFrac, float32v( 1 ) - distFrac );
+
+        return this->ScaleOutput( float32v( 1 ) - nearest * float32v( 4 ), -1, 1 );
+    }
+};
+
+template<FastSIMD::FeatureSet SIMD>
+class FastSIMD::DispatchClass<FastNoise::Cylinders, SIMD> final : public virtual FastNoise::Cylinders, public DispatchClass<FastNoise::VariableRange<FastNoise::ScalableGenerator>, SIMD>
+{
+    FASTNOISE_IMPL_GEN_T;
+
+    template<typename... P>
+    FS_FORCEINLINE float32v GenT( int32v seed, P... pos ) const
+    {
+        this->ScalePositions( pos... );
+
+        const float32v posArr[] = { pos... };
+        float32v distSqr = posArr[0] * posArr[0];
+        if constexpr( sizeof...( P ) > 1 )
+        {
+            distSqr = FS::FMulAdd( posArr[1], posArr[1], distSqr );
+        }
+        float32v dist = FS::Sqrt( distSqr );
+
+        float32v distFrac = dist - FS::Floor( dist );
+        float32v nearest = FS::Min( distFrac, float32v( 1 ) - distFrac );
+
+        return this->ScaleOutput( float32v( 1 ) - nearest * float32v( 4 ), -1, 1 );
+    }
+};
+
+template<FastSIMD::FeatureSet SIMD>
+class FastSIMD::DispatchClass<FastNoise::FractalErosion, SIMD> final : public virtual FastNoise::FractalErosion, public DispatchClass<FastNoise::Generator, SIMD>
+{
+    // iq / deCarpentier swiss-turbulence shape with finite-difference
+    // gradients: later octaves are damped where the accumulated gradient is
+    // steep. 1 + dimensions source evaluations per octave.
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y ) const
+    {
+        float32v gain = this->GetSourceValue( mGain, seed, x, y );
+        float32v lacunarity( mLacunarity );
+        float32v h( mStepSize );
+        float32v invH( 1.0f / mStepSize );
+        float32v erosion( mErosionStrength );
+        float32v amp( 1.0f );
+        float32v sum( 0.0f );
+        float32v dsx( 0.0f ), dsy( 0.0f );
+
+        for( int i = 0; i < mOctaves; i++ )
+        {
+            float32v n = this->GetSourceValue( mSource, seed, x, y );
+            float32v dx = ( this->GetSourceValue( mSource, seed, x + h, y ) - n ) * invH;
+            float32v dy = ( this->GetSourceValue( mSource, seed, x, y + h ) - n ) * invH;
+
+            dsx += dx * amp;
+            dsy += dy * amp;
+
+            float32v damp = float32v( 1 ) + erosion * FS::FMulAdd( dsx, dsx, dsy * dsy );
+            sum += amp * n / damp;
+
+            seed -= int32v( -1 );
+            x *= lacunarity;
+            y *= lacunarity;
+            amp *= gain;
+        }
+        return sum;
+    }
+
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y, float32v z ) const
+    {
+        float32v gain = this->GetSourceValue( mGain, seed, x, y, z );
+        float32v lacunarity( mLacunarity );
+        float32v h( mStepSize );
+        float32v invH( 1.0f / mStepSize );
+        float32v erosion( mErosionStrength );
+        float32v amp( 1.0f );
+        float32v sum( 0.0f );
+        float32v dsx( 0.0f ), dsy( 0.0f ), dsz( 0.0f );
+
+        for( int i = 0; i < mOctaves; i++ )
+        {
+            float32v n = this->GetSourceValue( mSource, seed, x, y, z );
+            float32v dx = ( this->GetSourceValue( mSource, seed, x + h, y, z ) - n ) * invH;
+            float32v dy = ( this->GetSourceValue( mSource, seed, x, y + h, z ) - n ) * invH;
+            float32v dz = ( this->GetSourceValue( mSource, seed, x, y, z + h ) - n ) * invH;
+
+            dsx += dx * amp;
+            dsy += dy * amp;
+            dsz += dz * amp;
+
+            float32v damp = float32v( 1 ) + erosion * FS::FMulAdd( dsx, dsx, FS::FMulAdd( dsy, dsy, dsz * dsz ) );
+            sum += amp * n / damp;
+
+            seed -= int32v( -1 );
+            x *= lacunarity;
+            y *= lacunarity;
+            z *= lacunarity;
+            amp *= gain;
+        }
+        return sum;
+    }
+
+    float32v FS_VECTORCALL Gen( int32v seed, float32v x, float32v y, float32v z, float32v w ) const
+    {
+        float32v gain = this->GetSourceValue( mGain, seed, x, y, z, w );
+        float32v lacunarity( mLacunarity );
+        float32v h( mStepSize );
+        float32v invH( 1.0f / mStepSize );
+        float32v erosion( mErosionStrength );
+        float32v amp( 1.0f );
+        float32v sum( 0.0f );
+        float32v dsx( 0.0f ), dsy( 0.0f ), dsz( 0.0f ), dsw( 0.0f );
+
+        for( int i = 0; i < mOctaves; i++ )
+        {
+            float32v n = this->GetSourceValue( mSource, seed, x, y, z, w );
+            float32v dx = ( this->GetSourceValue( mSource, seed, x + h, y, z, w ) - n ) * invH;
+            float32v dy = ( this->GetSourceValue( mSource, seed, x, y + h, z, w ) - n ) * invH;
+            float32v dz = ( this->GetSourceValue( mSource, seed, x, y, z + h, w ) - n ) * invH;
+            float32v dw = ( this->GetSourceValue( mSource, seed, x, y, z, w + h ) - n ) * invH;
+
+            dsx += dx * amp;
+            dsy += dy * amp;
+            dsz += dz * amp;
+            dsw += dw * amp;
+
+            float32v damp = float32v( 1 ) + erosion * FS::FMulAdd( dsx, dsx, FS::FMulAdd( dsy, dsy, FS::FMulAdd( dsz, dsz, dsw * dsw ) ) );
+            sum += amp * n / damp;
+
+            seed -= int32v( -1 );
+            x *= lacunarity;
+            y *= lacunarity;
+            z *= lacunarity;
+            w *= lacunarity;
+            amp *= gain;
+        }
+        return sum;
+    }
+};

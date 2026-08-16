@@ -495,6 +495,158 @@ namespace FastNoise
     };
 #endif
 
+    /** @brief Gradient magnitude of the source via one-sided finite
+     *  differences - a steepness field for material masks.
+     *
+     *  Costs 1 + dimensions extra source evaluations per sample (4 in 3D), so
+     *  keep the source cheap. Step Size is in the same pre-scaled units the
+     *  positions arrive in. */
+    class Slope : public virtual Generator
+    {
+    public:
+        const Metadata& GetMetadata() const override;
+
+        void SetSource( SmartNodeArg<> gen ) { this->SetSourceMemberVariable( mSource, gen ); }
+        void SetStepSize( float value ) { mStepSize = value; }
+
+    protected:
+        GeneratorSource mSource;
+        float mStepSize = 0.01f;
+    };
+
+#ifdef FASTNOISE_METADATA
+    template<>
+    struct MetadataT<Slope> : MetadataT<Generator>
+    {
+        SmartNode<> CreateNode( FastSIMD::FeatureSet ) const override;
+
+        MetadataT()
+        {
+            groups.push_back( "Modifiers" );
+            this->AddGeneratorSource( "Source", &Slope::SetSource );
+            this->AddVariable( { "Step Size",
+                "Finite-difference step in position units\n"
+                "Smaller = more local slope, larger = smoothed slope" },
+                0.01f, &Slope::SetStepSize, 0.0f, 0.0f, 0.001f );
+
+            description =
+                "Gradient magnitude of the source (how steep it is), via finite\n"
+                "differences - costs one extra source evaluation per dimension\n"
+                "Feed terrain into it and threshold the result for cliff masks";
+        }
+    };
+#endif
+
+    /** @brief Concentric spheres around the origin, one per distance unit. */
+    class Spheres : public virtual VariableRange<ScalableGenerator>
+    {
+    public:
+        const Metadata& GetMetadata() const override;
+    };
+
+#ifdef FASTNOISE_METADATA
+    template<>
+    struct MetadataT<Spheres> : MetadataT<VariableRange<ScalableGenerator>>
+    {
+        SmartNode<> CreateNode( FastSIMD::FeatureSet ) const override;
+
+        MetadataT()
+        {
+            groups.push_back( "Basic Generators" );
+            description =
+                "Concentric spherical shells around the origin, one per distance unit\n"
+                "1 on each shell, falling to -1 halfway between shells\n"
+                "Feature Scale sets the shell spacing";
+        }
+    };
+#endif
+
+    /** @brief Concentric cylinders around the Z axis (first two position axes). */
+    class Cylinders : public virtual VariableRange<ScalableGenerator>
+    {
+    public:
+        const Metadata& GetMetadata() const override;
+    };
+
+#ifdef FASTNOISE_METADATA
+    template<>
+    struct MetadataT<Cylinders> : MetadataT<VariableRange<ScalableGenerator>>
+    {
+        SmartNode<> CreateNode( FastSIMD::FeatureSet ) const override;
+
+        MetadataT()
+        {
+            groups.push_back( "Basic Generators" );
+            description =
+                "Concentric cylindrical shells around the Z axis, one per distance unit\n"
+                "Only X and Y contribute; 1 on each shell, -1 halfway between\n"
+                "Feature Scale sets the shell spacing";
+        }
+    };
+#endif
+
+    /** @brief Erosion-style fractal: octaves are damped where the accumulated
+     *  gradient is steep, carving smooth valleys into rough slopes
+     *  (deCarpentier / iq "swiss turbulence" via finite differences).
+     *
+     *  The gradient comes from one-sided finite differences of the SOURCE, so
+     *  any generator works underneath - at the price of 1 + dimensions source
+     *  evaluations per octave (4 per octave in 3D). The most expensive node in
+     *  the palette; use modest octave counts. */
+    class FractalErosion : public virtual Generator
+    {
+    public:
+        static constexpr int kMaxOctaves = 16;
+
+        const Metadata& GetMetadata() const override;
+
+        void SetSource( SmartNodeArg<> gen ) { this->SetSourceMemberVariable( mSource, gen ); }
+        void SetGain( float value ) { mGain = value; }
+        void SetGain( SmartNodeArg<> gen ) { this->SetSourceMemberVariable( mGain, gen ); }
+        void SetOctaveCount( int value ) { mOctaves = value; }
+        void SetLacunarity( float value ) { mLacunarity = value; }
+        void SetStepSize( float value ) { mStepSize = value; }
+        void SetErosionStrength( float value ) { mErosionStrength = value; }
+
+    protected:
+        GeneratorSource mSource;
+        HybridSource mGain = 0.5f;
+        int   mOctaves = 4;
+        float mLacunarity = 2.0f;
+        float mStepSize = 0.01f;
+        float mErosionStrength = 1.0f;
+    };
+
+#ifdef FASTNOISE_METADATA
+    template<>
+    struct MetadataT<FractalErosion> : MetadataT<Generator>
+    {
+        SmartNode<> CreateNode( FastSIMD::FeatureSet ) const override;
+
+        MetadataT()
+        {
+            groups.push_back( "Fractal" );
+            this->AddGeneratorSource( "Source", &FractalErosion::SetSource );
+            this->AddHybridSource( "Gain", 0.5f, &FractalErosion::SetGain, &FractalErosion::SetGain );
+            this->AddVariable( "Octaves", 4, &FractalErosion::SetOctaveCount, 2, FractalErosion::kMaxOctaves );
+            this->AddVariable( "Lacunarity", 2.0f, &FractalErosion::SetLacunarity );
+            this->AddVariable( { "Step Size",
+                "Finite-difference step for the erosion gradient" },
+                0.01f, &FractalErosion::SetStepSize, 0.0f, 0.0f, 0.001f );
+            this->AddVariable( { "Erosion Strength",
+                "How strongly steep accumulated slopes damp later octaves\n"
+                "0 behaves like plain FBm, higher carves deeper valleys" },
+                1.0f, &FractalErosion::SetErosionStrength );
+
+            description =
+                "Erosion-look fractal: each octave is damped where the slopes\n"
+                "accumulated so far are steep, giving smooth valley floors and\n"
+                "rough ridges (swiss turbulence)\n"
+                "Costs one source evaluation per dimension per octave - expensive";
+        }
+    };
+#endif
+
     /** @brief How BoxDomain evaluates its planes. */
     enum class BoxDomainMode
     {

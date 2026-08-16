@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "Modifiers.h"
 
 template<FastSIMD::FeatureSet SIMD>
@@ -283,40 +285,53 @@ class FastSIMD::DispatchClass<GeneratorCache, SIMD> final : public virtual Gener
     template<typename... P>
     FS_FORCEINLINE float32v GenT( int32v seed, P... pos ) const
     {
-        thread_local static const void* CachedGenerator = nullptr;
-        thread_local static std::int32_t CachedSeed[int32v::ElementCount];
-        thread_local static float CachedPos[sizeof...(P)][int32v::ElementCount];
-        thread_local static float CachedValue[int32v::ElementCount];
+        // One slot per cache INSTANCE (per thread, per SIMD level and arity):
+        // the previous single static slot made two caches in one graph evict
+        // each other on every call. Value-transparent either way - a miss
+        // computes exactly what the uncached path would.
         // TLS is not always aligned (compiler bug), need to avoid using SIMD types
-        
+        struct FSlot
+        {
+            const void* CachedGenerator;
+            std::int32_t CachedSeed[int32v::ElementCount];
+            float CachedPos[sizeof...(P)][int32v::ElementCount];
+            float CachedValue[int32v::ElementCount];
+        };
+        thread_local static std::vector<FSlot> Slots;
+        if( Slots.size() <= mCacheSlot )
+        {
+            Slots.resize( mCacheSlot + 1, FSlot{} ); // null generator => first use misses
+        }
+        FSlot& Slot = Slots[mCacheSlot];
+
         const float32v arrayPos[] = { pos... };
 
-        bool isSame = (CachedGenerator == mSource.simdGeneratorPtr);
-        isSame &= !FS::AnyMask( seed != FS::Load<int32v>( CachedSeed ) );
+        bool isSame = (Slot.CachedGenerator == mSource.simdGeneratorPtr);
+        isSame &= !FS::AnyMask( seed != FS::Load<int32v>( Slot.CachedSeed ) );
 
         for( size_t i = 0; i < sizeof...( P ); i++ )
         {
-            isSame &= !FS::AnyMask( arrayPos[i] != FS::Load<float32v>( CachedPos[i] ) );
+            isSame &= !FS::AnyMask( arrayPos[i] != FS::Load<float32v>( Slot.CachedPos[i] ) );
         }
 
         if( !isSame )
         {
-            CachedGenerator = mSource.simdGeneratorPtr;
+            Slot.CachedGenerator = mSource.simdGeneratorPtr;
 
             float32v value = this->GetSourceValue( mSource, seed, pos... );
 
-            FS::Store( CachedValue, value );
-            FS::Store( CachedSeed, seed );
+            FS::Store( Slot.CachedValue, value );
+            FS::Store( Slot.CachedSeed, seed );
 
             for( size_t i = 0; i < sizeof...(P); i++ )
             {
-                FS::Store( CachedPos[i], arrayPos[i] );
+                FS::Store( Slot.CachedPos[i], arrayPos[i] );
             }
 
             return value;
         }
 
-        return FS::Load<float32v>( CachedValue );
+        return FS::Load<float32v>( Slot.CachedValue );
     }
 };
 

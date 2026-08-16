@@ -535,10 +535,21 @@ public:
         }
     }
 
+    const void* GetBatchSIMDPtr() const final
+    {
+        return reinterpret_cast<const void*>( static_cast<VoidPtrStorageType>( this ) );
+    }
+
     void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ, float* genXoff, float* genYoff, float* genZoff, int seed, int size, Generator* genDomain ) const final
     {
+        Gen3DAdd( noiseOut, genX, genY, genZ, genXoff, genYoff, genZoff, seed, size,
+            reinterpret_cast<const void*>( dynamic_cast<VoidPtrStorageType>( genDomain ) ) );
+    }
+
+    void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ, float* genXoff, float* genYoff, float* genZoff, int seed, int size, const void* genDomainSIMD ) const final
+    {
         ScopeExitx86ZeroUpper zeroUpper;
-        auto genDomainFS = dynamic_cast<VoidPtrStorageType>( genDomain );
+        auto genDomainFS = reinterpret_cast<VoidPtrStorageType>( genDomainSIMD );
 
         int32v seedV( seed );
 
@@ -575,10 +586,23 @@ public:
                        Generator* genB, Generator* genPower, Generator* genDomain,
                        int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const final
     {
+        Gen3DFullAdd( noiseOut, genX, genY, genZ, genXoff, genYoff, genZoff, seed, size, overlap, biomover,
+            reinterpret_cast<const void*>( dynamic_cast<VoidPtrStorageType>( genB ) ),
+            reinterpret_cast<const void*>( dynamic_cast<VoidPtrStorageType>( genPower ) ),
+            reinterpret_cast<const void*>( dynamic_cast<VoidPtrStorageType>( genDomain ) ),
+            biomIndex, biomPower, biomSwitch, biomList );
+    }
+
+    void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+                       float* genXoff, float* genYoff, float* genZoff,
+                       int seed, int size, float overlap, float biomover,
+                       const void* genBSIMD, const void* genPowerSIMD, const void* genDomainSIMD,
+                       int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const final
+    {
         ScopeExitx86ZeroUpper zeroUpper;
-        auto genBFS = dynamic_cast<VoidPtrStorageType>( genB );
-        auto genPowerFS = dynamic_cast<VoidPtrStorageType>( genPower );
-        auto genDomainFS = dynamic_cast<VoidPtrStorageType>( genDomain );
+        auto genBFS = reinterpret_cast<VoidPtrStorageType>( genBSIMD );
+        auto genPowerFS = reinterpret_cast<VoidPtrStorageType>( genPowerSIMD );
+        auto genDomainFS = reinterpret_cast<VoidPtrStorageType>( genDomainSIMD );
 
         int32v seedV( seed );
         float32v overlapV( overlap );

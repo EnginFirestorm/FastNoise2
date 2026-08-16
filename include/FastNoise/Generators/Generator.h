@@ -483,6 +483,32 @@ namespace FastNoise
             Generator* genB, Generator* genPower, Generator* genDomain,
             int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const = 0;
 
+        /** @brief Resolves this node ONCE to the SIMD-dispatch pointer the
+         *  pre-resolved batch overloads below take. The Generator*-taking
+         *  overloads perform a cross-DLL RTTI dynamic_cast per CALL (three for
+         *  Gen3DFullAdd); resolving at graph-compile time and passing the
+         *  pointer per batch removes that entirely. The pointer is only valid
+         *  for the lifetime of this node and only with nodes of the same
+         *  feature set - exactly the invariants the compiled world config
+         *  already guarantees. */
+        virtual const void* GetBatchSIMDPtr() const = 0;
+
+        /** @brief Gen3DAdd taking a domain pointer pre-resolved with
+         *  GetBatchSIMDPtr(). Behaviour is bit-identical to the Generator*
+         *  overload. */
+        virtual void Gen3DAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+            float* genXoff, float* genYoff, float* genZoff,
+            int seed, int size, const void* genDomainSIMD ) const = 0;
+
+        /** @brief Gen3DFullAdd taking pointers pre-resolved with
+         *  GetBatchSIMDPtr(). Behaviour is bit-identical to the Generator*
+         *  overload. */
+        virtual void Gen3DFullAdd( float* noiseOut, float* genX, float* genY, float* genZ,
+            float* genXoff, float* genYoff, float* genZoff,
+            int seed, int size, float overlap, float biomover,
+            const void* genBSIMD, const void* genPowerSIMD, const void* genDomainSIMD,
+            int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const = 0;
+
     protected:
         template<typename T>
         void SetSourceMemberVariable( BaseSource<T>& memberVariable, SmartNodeArg<T> gen )

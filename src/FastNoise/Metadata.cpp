@@ -6,6 +6,7 @@
 #include <limits>
 #include <cassert>
 #include <cstdint>
+#include <atomic>
 
 #include "FastNoise/Metadata.h"
 #include "FastNoise/FastNoise.h"
@@ -15,21 +16,27 @@ using namespace FastNoise;
 
 Metadata::Vector<const Metadata*> Metadata::sAllMetadata;
 
+std::uint32_t FastNoise::NextGeneratorCacheSlot()
+{
+    static std::atomic<std::uint32_t> sNextSlot{ 0 };
+    return sNextSlot.fetch_add( 1, std::memory_order_relaxed );
+}
+
 template<typename T>
 constexpr static std::nullptr_t gMetadataVectorSize = nullptr; // Invalid
 
 // Setting these values avoids needless vector resizing and oversizing on startup
 // Sadly there is no way to automate this as they fill up as part of static init
 template<>
-constexpr size_t gMetadataVectorSize<const Metadata*> = 59;
+constexpr size_t gMetadataVectorSize<const Metadata*> = 63;
 template<>
-constexpr size_t gMetadataVectorSize<const char*> = 117;
+constexpr size_t gMetadataVectorSize<const char*> = 121;
 template<>
-constexpr size_t gMetadataVectorSize<Metadata::MemberVariable> = 142;
+constexpr size_t gMetadataVectorSize<Metadata::MemberVariable> = 153;
 template<>
-constexpr size_t gMetadataVectorSize<Metadata::MemberNodeLookup> = 40;
+constexpr size_t gMetadataVectorSize<Metadata::MemberNodeLookup> = 42;
 template<>
-constexpr size_t gMetadataVectorSize<Metadata::MemberHybrid> = 81;
+constexpr size_t gMetadataVectorSize<Metadata::MemberHybrid> = 82;
 
 template<typename T>
 static std::vector<T>& GetVectorStorage()

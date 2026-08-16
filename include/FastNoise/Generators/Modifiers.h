@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+
 #include "Generator.h"
 
 namespace FastNoise
@@ -456,6 +458,10 @@ namespace FastNoise
     };
 #endif
 
+    /** Hands each GeneratorCache instance a distinct thread-local slot index.
+     *  Defined in the library so every construction path shares one counter. */
+    FASTNOISE_API std::uint32_t NextGeneratorCacheSlot();
+
     class GeneratorCache : public virtual Generator
     {
     public:
@@ -465,6 +471,12 @@ namespace FastNoise
 
     protected:
         GeneratorSource mSource;
+
+        // Not reflected: an implementation detail, not graph data. The old
+        // kernel kept ONE thread-local slot for every cache instance, so two
+        // caches in one graph evicted each other on every call and both became
+        // pure overhead. Each instance now owns a slot of its own.
+        std::uint32_t mCacheSlot = NextGeneratorCacheSlot();
     };
 
 #ifdef FASTNOISE_METADATA
