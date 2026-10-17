@@ -525,6 +525,23 @@ namespace FastNoise
         virtual void SetSourceSIMDPtr( const Generator* base, const void** simdPtr ) = 0;
         virtual int32_t ReferencesFetchAdd( int32_t add = 0 ) const noexcept = 0;
 
+    public:
+        /** @brief Gen3DFullAdd (pre-resolved pointers) sampling the Dual Switch (@p genPowerSIMD)
+         *  at positions of its own, @p genXsw / @p genYsw / @p genZsw: the caller passes the
+         *  unwarped arrays (exactly Gen3DFullAdd) or the warped ones, and the switch follows the
+         *  biome offsets as the domain does. A choice of pointers per call - nothing in the loop.
+         *  Declared last and under a name of its own, so it is appended to the vtable: a caller
+         *  built against the previous header finds every older entry where it was (MSVC orders
+         *  the overloads of one name together, a further Gen3DFullAdd overload would move them). */
+        virtual void Gen3DFullAddSwitch( float* noiseOut, float* genX, float* genY, float* genZ,
+            float* genXoff, float* genYoff, float* genZoff,
+            float* genXsw, float* genYsw, float* genZsw,
+            int seed, int size, float overlap, float biomover,
+            const void* genBSIMD, const void* genPowerSIMD, const void* genDomainSIMD,
+            int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const = 0;
+
+    private:
+
         template<typename>
         friend class SmartNode;
         friend void Internal::BumpNodeRefences( const Generator*, bool );

@@ -599,6 +599,19 @@ public:
                        const void* genBSIMD, const void* genPowerSIMD, const void* genDomainSIMD,
                        int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const final
     {
+        // the switch at the unwarped positions, as it always was
+        Gen3DFullAddSwitch( noiseOut, genX, genY, genZ, genXoff, genYoff, genZoff, genX, genY, genZ,
+            seed, size, overlap, biomover, genBSIMD, genPowerSIMD, genDomainSIMD,
+            biomIndex, biomPower, biomSwitch, biomList );
+    }
+
+    void Gen3DFullAddSwitch( float* noiseOut, float* genX, float* genY, float* genZ,
+                             float* genXoff, float* genYoff, float* genZoff,
+                             float* genXsw, float* genYsw, float* genZsw,
+                             int seed, int size, float overlap, float biomover,
+                             const void* genBSIMD, const void* genPowerSIMD, const void* genDomainSIMD,
+                             int biomIndex, float* biomPower, int* biomSwitch, int* biomList ) const final
+    {
         ScopeExitx86ZeroUpper zeroUpper;
         auto genBFS = reinterpret_cast<VoidPtrStorageType>( genBSIMD );
         auto genPowerFS = reinterpret_cast<VoidPtrStorageType>( genPowerSIMD );
@@ -632,7 +645,8 @@ public:
                 float32v yPos = FS::Load<float32v>( &genY[index] );
                 float32v zPos = FS::Load<float32v>( &genZ[index] );
 
-                float32v basePow = genPowerFS->Gen( seedV, xPos, yPos, zPos );
+                float32v basePow = genPowerFS->Gen( seedV, FS::Load<float32v>( &genXsw[index] ),
+                    FS::Load<float32v>( &genYsw[index] ), FS::Load<float32v>( &genZsw[index] ) );
                 float32v powA = FS::Max( overlapV + basePow, min );
                 float32v powB = FS::Max( overlapV - basePow, min );
 
